@@ -1,9 +1,8 @@
 {
-  "name": "@jiancode77/baileys",
+  "name": "baileys",
   "version": "1.0.0",
-  "description": "Custom Baileys with pairing code support",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "keywords": ["baileys", "whatsapp", "pairing-code"],
   "author": "jiancode77",
   "license": "MIT",
