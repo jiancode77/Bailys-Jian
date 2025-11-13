@@ -1,118 +1,61 @@
-# JianBailys - Custom Baileys Package
-
-## 1. Setup Project
+## 4. Upload ke GitHub
 
 ```bash
-mkdir JianBailys
-cd JianBailys
-npm init -y
-npm install @whiskeysockets/baileys chalk
+git init
+echo "node_modules/\nsession/" > .gitignore
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/jiancode77/Bailys-Jian.git
+git branch -M main
+git push -u origin main
 ```
 
-## 2. Struktur Folder
+## 5. Cara Orang Lain Pakai
 
-```
-JianBailys/
-├── index.js
-├── package.json
-└── README.md
-```
-
-## 3. package.json
-
-```json
-{
-  "name": "@jiancode77/jianbailys",
-  "version": "1.0.0",
-  "description": "Custom Baileys with pairing code support",
-  "main": "index.js",
-  "type": "commonjs",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": ["baileys", "whatsapp", "pairing-code"],
-  "author": "jiancode77",
-  "license": "MIT",
-  "dependencies": {
-    "@whiskeysockets/baileys": "latest",
-    "chalk": "^4.1.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jiancode77/JianBailys.git"
-  }
-}
-```
-
-## 4. index.js
-
-```javascript
-const originalBaileys = require('@whiskeysockets/baileys');
-const chalk = require('chalk');
-
-console.log(chalk.bold.cyan('[ Bailys Jian ] Ready..'));
-
-const makeWASocket = (config) => {
-    return originalBaileys.default(config);
-};
-
-module.exports = {
-    ...originalBaileys,
-    default: makeWASocket,
-    makeWASocket
-};
-```
-
-## 5. README.md
-
-```markdown
-# Bailys-Jian
-
-Custom Baileys package dengan pairing code support
-
-## Installation
-
+### Opsi 1: Install langsung
 ```bash
 npm install github:jiancode77/Bailys-Jian
 ```
 
-## Usage
+### Opsi 2: Pakai alias di package.json (RECOMMENDED)
 
-### Basic Usage (QR Code)
-
-```javascript
-const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('github:jiancode77/Bailys-Jian');
-
-async function start() {
-    const { state, saveCreds } = await useMultiFileAuthState('./session');
-    
-    const sock = makeWASocket({
-        auth: state,
-        printQRInTerminal: true
-    });
-
-    sock.ev.on('creds.update', saveCreds);
-    
-    sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update;
-        if (connection === 'close') {
-            const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-            if (shouldReconnect) start();
-        } else if (connection === 'open') {
-            console.log('Connected!');
-        }
-    });
+Di `package.json` mereka:
+```json
+{
+  "dependencies": {
+    "@whiskeysockets/baileys": "npm:@jiancode77/baileys@github:jiancode77/Bailys-Jian"
+  }
 }
-
-start();
 ```
 
-### Pairing Code Usage
+Atau lebih simple:
+```json
+{
+  "dependencies": {
+    "@whiskeysockets/baileys": "github:jiancode77/Bailys-Jian"
+  }
+}
+```
 
+Lalu:
+```bash
+npm install
+```
+
+**Sekarang mereka bisa pakai seperti biasa:**
 ```javascript
-const { makeWASocket, useMultiFileAuthState } = require('github:jiancode77/Bailys-Jian');
+const { makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
+```
 
-async function startWithPairing() {
+Tapi isinya adalah baileys modifikasi kamu! ✅
+
+## 6. Contoh Penggunaan
+
+### Pairing Code Biasa
+```javascript
+const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+
+async function connect() {
     const { state, saveCreds } = await useMultiFileAuthState('./session');
     
     const sock = makeWASocket({
@@ -123,21 +66,29 @@ async function startWithPairing() {
     if (!sock.authState.creds.registered) {
         const phoneNumber = '628123456789';
         const code = await sock.requestPairingCode(phoneNumber);
-        console.log('Pairing Code:', code);
     }
 
     sock.ev.on('creds.update', saveCreds);
+    
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
+        if (connection === 'close') {
+            const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+            if (shouldReconnect) connect();
+        } else if (connection === 'open') {
+            console.log('Connected!');
+        }
+    });
 }
 
-startWithPairing();
+connect();
 ```
 
 ### Custom Pairing Code
-
 ```javascript
-const { makeWASocket, useMultiFileAuthState } = require('github:jiancode77/Bailys-Jian');
+const { makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 
-async function startWithCustomPairing() {
+async function connectCustom() {
     const { state, saveCreds } = await useMultiFileAuthState('./session');
     
     const sock = makeWASocket({
@@ -147,51 +98,115 @@ async function startWithCustomPairing() {
 
     if (!sock.authState.creds.registered) {
         const phoneNumber = '628123456789';
-        await sock.requestPairingCode(phoneNumber);
+        const customCode = 'JIAN-CODE';
+        await sock.requestPairingCode(phoneNumber, customCode);
     }
 
     sock.ev.on('creds.update', saveCreds);
 }
 
-startWithCustomPairing();
+connectCustom();
+```
+
+## 7. README.md
+
+```markdown
+# @jiancode77/baileys
+
+Custom Baileys package dengan full pairing code support
+
+## Installation
+
+Tambahkan di `package.json`:
+```json
+{
+  "dependencies": {
+    "@whiskeysockets/baileys": "github:jiancode77/Bailys-Jian"
+  }
+}
+```
+
+Lalu:
+```bash
+npm install
+```
+
+## Usage
+
+### Pairing Code Biasa
+```javascript
+const { makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
+
+async function connect() {
+    const { state, saveCreds } = await useMultiFileAuthState('./session');
+    
+    const sock = makeWASocket({
+        auth: state,
+        printQRInTerminal: false
+    });
+
+    if (!sock.authState.creds.registered) {
+        const code = await sock.requestPairingCode('628123456789');
+        console.log('Pairing Code:', code);
+    }
+
+    sock.ev.on('creds.update', saveCreds);
+}
+
+connect();
+```
+
+### Custom Pairing Code
+```javascript
+const code = await sock.requestPairingCode('628123456789', 'YOUR-CUSTOM-CODE');
 ```
 
 ## Features
 
-- ✅ Console log chalk bold cyan saat package di-load
-- ✅ Support pairing code
-- ✅ Support custom pairing code
-- ✅ Full baileys compatibility
-- ✅ QR Code support
+- ✅ 100% Support Pairing Code
+- ✅ Support Custom Pairing Code  
+- ✅ Console log chalk cyan bold
+- ✅ Full Baileys compatibility
+- ✅ Drop-in replacement untuk @whiskeysockets/baileys
+
+## Console Output
+
+Saat package di-load:
+```
+[ Bailys Jian ] Ready..
+```
+
+Saat pairing code:
+```
+[ Bailys Jian ] Pairing Code: XXXX-XXXX
+```
 
 ## Author
 
-**jiancode77**
+jiancode77
 
 ## License
 
 MIT
 ```
 
-## 6. Upload ke GitHub
+## Hasil Akhir
 
-```bash
-git init
-echo "node_modules/\nsession/" > .gitignore
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/jiancode77/JianBailys.git
-git branch -M main
-git push -u origin main
+Orang install seperti ini:
+```json
+{
+  "dependencies": {
+    "@whiskeysockets/baileys": "github:jiancode77/Bailys-Jian"
+  }
+}
 ```
 
-## 7. Cara Install
-
-```bash
-npm install github:jiancode77/JianBailys
+Dan pakai seperti biasa:
+```javascript
+const baileys = require('@whiskeysockets/baileys');
 ```
 
-Ketika package di-import, otomatis muncul:
-```
-[ Bailys Jian ] Ready..
-```
+Tapi isinya baileys modifikasi kamu dengan:
+- ✅ Console log cyan bold
+- ✅ 100% support pairing code
+- ✅ Support custom pairing code
