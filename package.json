@@ -1,0 +1,21 @@
+{
+  "name": "@jiancode77/jianbailys",
+  "version": "1.0.0",
+  "description": "Custom Baileys with pairing code support",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["baileys", "whatsapp", "pairing-code"],
+  "author": "jiancode77",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "latest",
+    "chalk": "^4.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jiancode77/JianBailys.git"
+  }
+}
