@@ -2,7 +2,7 @@
   "name": "baileys",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "keywords": ["baileys", "whatsapp", "pairing-code"],
   "author": "jiancode77",
   "license": "MIT",
